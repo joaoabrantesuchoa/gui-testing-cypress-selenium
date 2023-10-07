@@ -51,13 +51,46 @@ describe('cart promotions', () => {
     assert(bodyText.includes('Promotion has been successfully updated.'));
   });
 
-  it('test case 2', async () => {
+  it('create new promotion', async () => {
     // Implement your test case 2 code here
   });
 
-  it('test case 3', async () => {
+  it('create new promotion cupom based', async () => {
     // Implement your test case 3 code here
   });
 
   // Implement the remaining test cases in a similar manner
+
+  it('filter cupom based promotions', async () => {
+    // Implement your test case 4 code here
+  });
+
+  it('filter not cupom based promotions', async () => {
+    // Implement your test case 5 code here
+  });
+
+  // Implement the remaining test cases in a similar manner
+
+  
+  it('order promotions by priority', async () => {
+    // Implement your test case 6 code here
+  });
+
+  it('list cupoms from cupom based promotion', async () => {
+    // Implement your test case 7 code here
+  });
+
+  it('create new cupom for cupom based promotion', async () => {
+    // Implement your test case 8 code here
+  });
+
+  
+  it('generate new cupom for cupom based for cupom based promotion', async () => {
+    // Implement your test case 9 code here
+  });
+
+  it('should create a new promotion and delete it', async () => {
+    // Implement your test case 10 code here
+  });
+
 });
