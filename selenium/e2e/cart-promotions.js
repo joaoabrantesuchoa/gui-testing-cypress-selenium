@@ -52,45 +52,128 @@ describe('cart promotions', () => {
   });
 
   it('create new promotion', async () => {
-    // Implement your test case 2 code here
+
+    await driver.findElement(By.linkText('Cart promotions')).click();
+
+    const buttons = await driver.findElement(By.css('*[class^="ui labeled icon button primary"]'));
+    await buttons[1].click();
+
+    const inputCode = await driver.findElement(By.id('sylius_promotion_code'));
+    inputCode.click();
+    inputCode.sendKeys('new_promotion_code');
+
+    const inputProm = await driver.findElement(By.id('sylius_protion_name'));
+    inputProm.click();
+    inputProm.sendKeys('New promotion name')
+
+    const createPromotion = await driver.findElement(By.css('*[class^="ui labeled icon button primary button"]'));
+    await createPromotion[1].click();
+
+    const bodyText = await driver.findElement(By.tagName('body')).getText();
+    assert(bodyText.includes('Promotion has been successfully created.'));
+
   });
 
   it('create new promotion cupom based', async () => {
-    // Implement your test case 3 code here
+
+    await driver.findElement(By.linkText('Cart promotions')).click();
+    const buttons = await driver.findElement(By.css('*[class^="ui labeled icon button primary"]'));
+    await buttons[1].click();
+
+    const inputCode = await driver.findElement(By.id('sylius_promotion_code'));
+    inputCode.click();
+    inputCode.sendKeys('new_promotion_code');
+
+    const inputProm = await driver.findElement(By.id('sylius_protion_name'));
+    inputProm.click();
+    inputProm.sendKeys('New promotion name')
+   
+    const couponBased = await driver.findElement(By.id('sylius_promotion_couponBased'));
+    couponBased.click();
+
+    const createPromotion = await driver.findElement(By.css('*[class^="ui labeled icon button primary button"]'));
+    await createPromotion[1].click();
+
+    const bodyText = await driver.findElement(By.tagName('body')).getText();
+    assert(bodyText.includes('Promotion has been successfully created.'));
   });
 
-  // Implement the remaining test cases in a similar manner
+  it('should throw an error if the code and name is not typed when create the promotion', async () => {
+    await driver.findElement(By.linkText('Cart promotions')).click();
+    const buttons = await driver.findElement(By.css('*[class^="ui labeled icon button primary"]'));
+    await buttons[1].click();
+
+    const inputCode = await driver.findElement(By.id('sylius_promotion_code'));
+    inputCode.click();
+    inputCode.sendKeys('new_promotion_code');
+
+    const inputDesc = await driver.findElement(By.id('sylius_protion_description'));
+    inputDesc.click();
+    inputDesc.sendKeys('Promotion Description')
+
+    const bodyText = await driver.findElement(By.tagName('body')).getText();
+    assert(bodyText.includes('This form contains errors.'));
+
+  })
 
   it('filter cupom based promotions', async () => {
-    // Implement your test case 4 code here
+    await driver.findElement(By.linkText('Cart promotions')).click();
+
+    await driver.findElement(By.id('criteria_search_type')).sendKeys('Contains');
+
+    await driver.findElement(By.id('criteria_couponBased')).select('true')
+
+    const filter = await driver.findElement(By.css('*[class^="ui blue labeled icon button"]'));
+    filter.click();
+
+    const bodyText = await driver.findElement(By.tagName('body')).getText();
+    assert(bodyText.includes('Christmas'));
+
   });
 
   it('filter not cupom based promotions', async () => {
-    // Implement your test case 5 code here
+    await driver.findElement(By.linkText('Cart promotions')).click();
+
+    await driver.findElement(By.id('criteria_search_type')).sendKeys('Contains');
+
+    await driver.findElement(By.id('criteria_couponBased')).select('false')
+
+    const filter = await driver.findElement(By.css('*[class^="ui blue labeled icon button"]'));
+    filter.click();
+
+    const bodyText = await driver.findElement(By.tagName('body')).getText();
+    assert(bodyText.includes('New Year'));
   });
 
-  // Implement the remaining test cases in a similar manner
-
-  
   it('order promotions by priority', async () => {
-    // Implement your test case 6 code here
+    await driver.findElement(By.linkText('Cart promotions')).click();
+
+    await driver.findElement(By.id('criteria_search_type')).sendKeys('Contains');
+
+    await driver.findElement(By.id('criteria_couponBased')).sendKeys('All')
+
+    const filter = await driver.findElement(By.css('*[class^="ui blue labeled icon button"]'));
+    filter.click();
+
+    const priority = await driver.findElement(By.css('*[class^="sortable sorted ascending sylius-table-column-priority"]'));
+    priority.click();
+
+    const bodyText = await driver.findElement(By.tagName('body')).getText();
+    assert(bodyText.includes(''));
+
   });
 
-  it('list cupoms from cupom based promotion', async () => {
-    // Implement your test case 7 code here
+  it('list cupoms from cupom based promotion and edit it', async () => {
+    // implement
+    
   });
 
   it('create new cupom for cupom based promotion', async () => {
     // Implement your test case 8 code here
   });
 
-  
   it('generate new cupom for cupom based for cupom based promotion', async () => {
     // Implement your test case 9 code here
   });
 
-  it('should create a new promotion and delete it', async () => {
-    // Implement your test case 10 code here
-  });
-
-});
+})
