@@ -111,6 +111,9 @@ describe('cart promotions', () => {
     inputDesc.click();
     inputDesc.sendKeys('Promotion Description')
 
+    const createPromotion = await driver.findElement(By.css('*[class^="ui labeled icon button primary button"]'));
+    await createPromotion[1].click();
+
     const bodyText = await driver.findElement(By.tagName('body')).getText();
     assert(bodyText.includes('This form contains errors.'));
 
@@ -164,16 +167,57 @@ describe('cart promotions', () => {
   });
 
   it('list cupoms from cupom based promotion and edit it', async () => {
-    // implement
+    await driver.findElement(By.linkText('Cart promotions')).click();
+
+    const manageCoupons = await driver.findElement(By.css('*[class^="ui labeled icon floating dropdown link button"]'));
+    manageCoupons.click();
+
+    await driver.findElement(By.id('menu transition visible')).sendKeys('List coupons');
+
+    const edit = await driver.findElement(By.css('*[class^="a ui labeled icon button"]'));
+    edit[1].click();
     
+    await driver.findElement(By.id('#sylius_promotion_coupon_usageLimit')).clear();
+
+    await driver.findElement(By.id('#sylius_promotion_coupon_usageLimit')).sendKeys('20');
+
+    const createPromotion = await driver.findElement(By.css('*[class^="ui labeled icon button primary button"]'));
+    await createPromotion[1].click();
+
+    const bodyText = await driver.findElement(By.tagName('body')).getText();
+    assert(bodyText.includes('Promotion coupon has been successfully updated.'));
+
   });
 
   it('create new cupom for cupom based promotion', async () => {
-    // Implement your test case 8 code here
+    await driver.findElement(By.linkText('Cart promotions')).click();
+
+    const manageCoupons = await driver.findElement(By.css('*[class^="ui labeled icon floating dropdown link button"]'));
+    manageCoupons.click();
+
+    await driver.findElement(By.id('menu transition visible')).sendKeys('create');
+
+    const inputCoupon = await driver.findElement(By.id('sylius_promotion_coupon_code'));
+    inputCode.click();
+    inputCode.sendKeys('new_cupom');
+
+    const createPromotion = await driver.findElement(By.css('*[class^="ui labeled icon button primary button"]'));
+    await createPromotion[1].click();
+
+    const bodyText = await driver.findElement(By.tagName('body')).getText();
+    assert(bodyText.includes('Promotion coupon has been successfully created.'));
+
+    const deletePromotion = await driver.findElement(By.css('*[class^="ui red labeled icon button"]'));
+    await deletePromotion[1].click();
+    const confirmDelete = await driver.findElement(By.css('*[class^="ui green ok inverted button"]')); 
+    await confirmDelete[1].click();
+
+    const bodyTxt = await driver.findElement(By.tagName('body')).getText();
+    assert(bodyTxt.includes('Promotion has been successfully deleted.'));
   });
 
   it('generate new cupom for cupom based for cupom based promotion', async () => {
-    // Implement your test case 9 code here
+
   });
 
 })
