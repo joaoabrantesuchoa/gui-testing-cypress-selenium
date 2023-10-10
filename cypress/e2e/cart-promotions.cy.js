@@ -70,7 +70,7 @@ describe('cart promotions', () => {
     cy.clickInFirst('a[href="/admin/promotions/"]');
 
     cy.get('body').find('span.ui.basic.label').filter(':contains("Yes")').filter(':has(i.checkmark.icon)').should('have.length', 2);
-    //cy.get('span.ui.basic.label').contains('Yes').first().click();
+    cy.get('span.ui.basic.label').contains('Yes').first().click();
 
     //Remove recent created promotion
     cy.get('input.bulk-select-checkbox').last().check();
