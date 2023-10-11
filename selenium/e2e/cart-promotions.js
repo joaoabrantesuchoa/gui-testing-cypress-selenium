@@ -85,7 +85,7 @@ describe('cart promotions', () => {
     await confirmationButton.click();
   });
 
-  it.only('create new promotion cupom based', async () => {
+  it('create new promotion cupom based', async () => {
     await driver.findElement(By.linkText('Cart promotions')).click();
 
     const button = await driver.findElement(By.css('a.ui.labeled.icon.button.primary'));
@@ -125,117 +125,132 @@ describe('cart promotions', () => {
 
   it('should throw an error if the code and name is not typed when create the promotion', async () => {
     await driver.findElement(By.linkText('Cart promotions')).click();
-    const buttons = await driver.findElement(By.css('*[class^="ui labeled icon button primary"]'));
-    await buttons[1].click();
 
-    const inputCode = await driver.findElement(By.id('sylius_promotion_code'));
-    inputCode.click();
-    inputCode.sendKeys('new_promotion_code');
+    const button = await driver.findElement(By.css('a.ui.labeled.icon.button.primary'));
+    await button.click();
 
-    const inputDesc = await driver.findElement(By.id('sylius_protion_description'));
-    inputDesc.click();
-    inputDesc.sendKeys('Promotion Description');
+    const createPromotionButton = await driver.findElement(By.xpath("//button[text()='Create']"));
+    await createPromotionButton.click();
 
-    const createPromotion = await driver.findElement(By.css('*[class^="ui labeled icon button primary button"]'));
-    await createPromotion[1].click();
-
-    const bodyText = await driver.findElement(By.tagName('body')).getText();
+    const bodyText = await driver.findElement(By.css('body')).getText();
     assert(bodyText.includes('This form contains errors.'));
   });
 
   it('filter cupom based promotions', async () => {
     await driver.findElement(By.linkText('Cart promotions')).click();
 
-    await driver.findElement(By.id('criteria_search_type')).sendKeys('Contains');
+    const selectElement = await driver.findElement(By.id('criteria_couponBased'));
+    await selectElement.findElement(By.css('option[value="true"]')).click();
 
-    await driver.findElement(By.id('criteria_couponBased')).select('true');
+    const filterButton = await driver.findElement(By.xpath('//button[contains(., "Filter")]'));
+    await filterButton.click();
 
-    const filter = await driver.findElement(By.css('*[class^="ui blue labeled icon button"]'));
-    filter.click();
-
-    const bodyText = await driver.findElement(By.tagName('body')).getText();
+    const bodyText = await driver.findElement(By.css('body')).getText();
     assert(bodyText.includes('Christmas'));
+    assert(!bodyText.includes('New Year'));
   });
 
   it('filter not cupom based promotions', async () => {
     await driver.findElement(By.linkText('Cart promotions')).click();
 
-    await driver.findElement(By.id('criteria_search_type')).sendKeys('Contains');
+    const selectElement = await driver.findElement(By.id('criteria_couponBased'));
+    await selectElement.findElement(By.css('option[value="false"]')).click();
 
-    await driver.findElement(By.id('criteria_couponBased')).select('false');
+    const filterButton = await driver.findElement(By.xpath('//button[contains(., "Filter")]'));
+    await filterButton.click();
 
-    const filter = await driver.findElement(By.css('*[class^="ui blue labeled icon button"]'));
-    filter.click();
-
-    const bodyText = await driver.findElement(By.tagName('body')).getText();
+    const bodyText = await driver.findElement(By.css('body')).getText();
     assert(bodyText.includes('New Year'));
+    assert(!bodyText.includes('Christmas'));
   });
 
   it('order promotions by priority', async () => {
     await driver.findElement(By.linkText('Cart promotions')).click();
 
-    await driver.findElement(By.id('criteria_search_type')).sendKeys('Contains');
+    const clearFiltersButton = await driver.findElement(By.xpath('//a[contains(., "Clear filters")]'));
+    await clearFiltersButton.click();
 
-    await driver.findElement(By.id('criteria_couponBased')).sendKeys('All');
+    const priorityColumnButton = await driver.findElement(By.xpath('//th[contains(., "Priority")]/a'));
+    await priorityColumnButton.click();
 
-    const filter = await driver.findElement(By.css('*[class^="ui blue labeled icon button"]'));
-    filter.click();
+    const elements = await driver.findElements(By.xpath('//tbody/tr/td[2]/div/span[@class="ui circular label"]'));
 
-    const priority = await driver.findElement(By.css('*[class^="sortable sorted ascending sylius-table-column-priority"]'));
-    priority.click();
+    const values = await Promise.all(
+      elements.map(async (element) => {
+        return await element.getText();
+      })
+    );
 
-    const bodyText = await driver.findElement(By.tagName('body')).getText();
-    assert(bodyText.includes(''));
+    const index0 = values.indexOf('0');
+    const index2 = values.indexOf('2');
+
+    assert(index0 < index2);
   });
 
   it('list cupoms from cupom based promotion and edit it', async () => {
     await driver.findElement(By.linkText('Cart promotions')).click();
 
-    const manageCoupons = await driver.findElement(By.css('*[class^="ui labeled icon floating dropdown link button"]'));
-    manageCoupons.click();
+    const dropdown = await driver.findElement(By.css('.ui.labeled.icon.floating.dropdown.link.button'));
+    await dropdown.click();
 
-    await driver.findElement(By.id('menu transition visible')).sendKeys('List coupons');
+    const listIcon = await driver.findElement(By.xpath('//a[@href="/admin/promotions/1/coupons/"]//i[@class="list icon"]'));
+    await listIcon.click();
 
-    const edit = await driver.findElement(By.css('*[class^="a ui labeled icon button"]'));
-    edit[1].click();
+    const editLink = await driver.findElement(By.css('a[href="/admin/promotions/1/coupons/1/edit"]'));
+    await editLink.click();
 
-    await driver.findElement(By.id('#sylius_promotion_coupon_usageLimit')).clear();
+    const inputElement = await driver.findElement(By.id('sylius_promotion_coupon_perCustomerUsageLimit'));
+    await inputElement.clear();
+    await inputElement.sendKeys('10');
 
-    await driver.findElement(By.id('#sylius_promotion_coupon_usageLimit')).sendKeys('20');
+    const saveButton = await driver.findElement(By.id('sylius_save_changes_button'));
+    await saveButton.click();
 
-    const createPromotion = await driver.findElement(By.css('*[class^="ui labeled icon button primary button"]'));
-    await createPromotion[1].click();
-
-    const bodyText = await driver.findElement(By.tagName('body')).getText();
+    const bodyText = await driver.findElement(By.css('body')).getText();
     assert(bodyText.includes('Promotion coupon has been successfully updated.'));
   });
 
   it('create new cupom for cupom based promotion', async () => {
     await driver.findElement(By.linkText('Cart promotions')).click();
 
-    const manageCoupons = await driver.findElement(By.css('*[class^="ui labeled icon floating dropdown link button"]'));
-    manageCoupons.click();
+    const dropdown = await driver.findElement(By.css('.ui.labeled.icon.floating.dropdown.link.button'));
+    await dropdown.click();
 
-    await driver.findElement(By.id('menu transition visible')).sendKeys('create');
+    const createCouponLink = await driver.findElement(By.css('a[href="/admin/promotions/1/coupons/new"]'));
+    await createCouponLink.click();
 
-    const inputCoupon = await driver.findElement(By.id('sylius_promotion_coupon_code'));
-    inputCode.click();
-    inputCode.sendKeys('new_cupom');
+    const inputField = await driver.findElement(By.id('sylius_promotion_coupon_code'));
+    await inputField.clear();
+    await inputField.sendKeys('new_cupom');
 
-    const createPromotion = await driver.findElement(By.css('*[class^="ui labeled icon button primary button"]'));
-    await createPromotion[1].click();
+    const createButton = await driver.findElement(By.css('button.ui.labeled.icon.primary.button'));
+    await createButton.click();
 
-    const bodyText = await driver.findElement(By.tagName('body')).getText();
+    const bodyText = await driver.findElement(By.css('body')).getText();
     assert(bodyText.includes('Promotion coupon has been successfully created.'));
-
-    const deletePromotion = await driver.findElement(By.css('*[class^="ui red labeled icon button"]'));
-    await deletePromotion[1].click();
-    const confirmDelete = await driver.findElement(By.css('*[class^="ui green ok inverted button"]'));
-    await confirmDelete[1].click();
-
-    const bodyTxt = await driver.findElement(By.tagName('body')).getText();
-    assert(bodyTxt.includes('Promotion has been successfully deleted.'));
   });
 
-  it('generate new cupom for cupom based for cupom based promotion', async () => {});
+  it('generate new cupom for cupom based for cupom based promotion', async () => {
+    await driver.findElement(By.linkText('Cart promotions')).click();
+
+    const dropdown = await driver.findElement(By.css('.ui.labeled.icon.floating.dropdown.link.button'));
+    await dropdown.click();
+
+    const createLink = await driver.findElement(By.linkText('Generate'));
+    await createLink.click();
+
+    const inputField = await driver.findElement(By.id('sylius_promotion_coupon_generator_instruction_codeLength'));
+    await inputField.clear();
+    await inputField.sendKeys('30');
+
+    const amountInputField = await driver.findElement(By.id('sylius_promotion_coupon_generator_instruction_amount'));
+    await amountInputField.clear();
+    await amountInputField.sendKeys('42');
+
+    const generateButton = await driver.findElement(By.css('button.ui.labeled.icon.primary.button'));
+    await generateButton.click();
+
+    const bodyText = await driver.findElement(By.css('body')).getText();
+    assert(bodyText.includes('Promotion coupons have been successfully generated.'));
+  });
 });
